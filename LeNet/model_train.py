@@ -85,3 +85,14 @@ def train_model_process(model, train_dataloader, val_dataloader, num_epochs):
            output = model(b_x)
 
            pre_lab = torch.argmax(output,dim=1)
+
+
+           loss = criterion(output,b_y)
+
+           optimizer.zero_grad()
+           loss.backward()
+           optimizer.step()
+
+           train_loss += loss.item() * b_x.size()
+
+           train_corrects += torch.sum(pre_lab == b_y)
