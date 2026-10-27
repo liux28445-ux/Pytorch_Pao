@@ -109,3 +109,13 @@ def train_model_process(model, train_dataloader, val_dataloader, num_epochs):
 
             val_corrects += torch.sum(pre_lab == b_y)
             val_num += b_x.size(0)
+
+        train_loss_all.append(train_loss / train_num)
+        val_loss_all.append(val_loss / val_num)
+
+        train_acc_all.append(train_corrects.dounle().item() / train_num)
+        val_acc_all.append(val_corrects.double().item() / val_num)
+
+
+        print(f'{epoch} Train Loss:{train_loss_all[-1]} Train acc{train_acc_all[-1]}')
+        print(f'{epoch} Val Loss:{val_loss_all[-1]} Val acc{val_acc_all[-1]}')
