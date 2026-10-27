@@ -76,23 +76,36 @@ def train_model_process(model, train_dataloader, val_dataloader, num_epochs):
         val_num = 0
 
         for step, (b_x, b_y) in enumerate(train_dataloader):
-           b_x = b_x.to(device)
-           b_y = b_y.to(device)
+            b_x = b_x.to(device)
+            b_y = b_y.to(device)
 
-           # 模型打开训练模式
-           model.train()
+            # 模型打开训练模式
+            model.train()
 
-           output = model(b_x)
+            output = model(b_x)
 
-           pre_lab = torch.argmax(output,dim=1)
+            pre_lab = torch.argmax(output, dim=1)
 
+            loss = criterion(output, b_y)
 
-           loss = criterion(output,b_y)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
-           optimizer.zero_grad()
-           loss.backward()
-           optimizer.step()
+            train_loss += loss.item() * b_x.size(0)
 
-           train_loss += loss.item() * b_x.size()
+            train_corrects += torch.sum(pre_lab == b_y)
+            train_num += b_x.size(0)
 
-           train_corrects += torch.sum(pre_lab == b_y)
+        for step, (b_x, b_y) in enumerate(train_dataloader):
+            b_x = b_x.to(device)
+            b_y = b_y.to(device)
+            model.eval()
+            output = model(b_x)
+            pre_lab = torch.argmax(output, dim=1)
+            loss = criterion(output, b_y)
+
+            val_loss += loss.item() * b_x.size(0)
+
+            val_corrects += torch.sum(pre_lab == b_y)
+            val_num += b_x.size(0)
