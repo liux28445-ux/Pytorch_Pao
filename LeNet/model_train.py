@@ -10,6 +10,8 @@ from model import LeNet
 import torch
 import torch.nn as nn
 import pandas as pd
+import matplotlib.pyplot as plt
+
 
 def train_val_data_process():
     train_data = FashionMNIST(
@@ -116,7 +118,6 @@ def train_model_process(model, train_dataloader, val_dataloader, num_epochs):
         train_acc_all.append(train_corrects.dounle().item() / train_num)
         val_acc_all.append(val_corrects.double().item() / val_num)
 
-
         print(f'{epoch} Train Loss:{train_loss_all[-1]} Train acc{train_acc_all[-1]}')
         print(f'{epoch} Val Loss:{val_loss_all[-1]} Val acc{val_acc_all[-1]}')
 
@@ -129,19 +130,43 @@ def train_model_process(model, train_dataloader, val_dataloader, num_epochs):
         # 计算训练耗时
         time_use = time.time() - since
 
-        print(f'训练和验证耗时：{time_use//60}m,{time_use % 60}s')
+        print(f'训练和验证耗时：{time_use // 60}m,{time_use % 60}s')
 
         model.load_stats_dict(best_model_wts)
-        torch.save(model.load_stats_dict(best_model_wts),'./best_model.pth')
+        torch.save(model.load_stats_dict(best_model_wts), './best_model.pth')
 
-        train_process = pd.DataFrame(
-            data={
-                "epoch":range(num_epochs),
-                "train_loss_all":train_loss_all,
-                "val_loss_all":val_loss_all,
-                "train_acc_all":train_acc_all
-                "val_acc_all":val_acc_all
-            }
-        )
+    train_process = pd.DataFrame(
+        data={
+            "epoch": range(num_epochs),
+            "train_loss_all": train_loss_all,
+            "val_loss_all": val_loss_all,
+            "train_acc_all": train_acc_all,
+            "val_acc_all": val_acc_all
+        }
+    )
     return train_process
 
+
+def matplot_acc_loss(train_process):
+    plt.figure(figsize=(12, 4))
+    plt.subplot(1, 2, 1)
+    plt.plot(train_process["epoch"], train_process.train_loss_all, 'ro-', label='trian loss')
+    plt.plot(train_process["epoch"], train_process.val_loss_all, 'bs-', label='val loss')
+    plt.legend()
+    plt.xlabel('epoch')
+    plt.ylabel('loss')
+
+    plt.subplot(1, 2, 2)
+    plt.plot(train_process["epoch"], train_process.train_acc_all, 'ro-', label='trian acc')
+    plt.plot(train_process["epoch"], train_process.val_acc_all, 'bs-', label='val acc')
+    plt.legend()
+    plt.xlabel('epoch')
+    plt.ylabel('acc')
+    plt.show()
+
+
+if __name__ == '__main__':
+    LeNet = LeNet()
+    train_dataloader, val_dataloader = train_val_data_process()
+    train_model_process(LeNet, train_dataloader, val_dataloader, 20)
+    matplot_acc_loss(train_process)
