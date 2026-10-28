@@ -9,7 +9,7 @@ from model import LeNet
 
 import torch
 import torch.nn as nn
-
+import pandas as pd
 
 def train_val_data_process():
     train_data = FashionMNIST(
@@ -119,3 +119,29 @@ def train_model_process(model, train_dataloader, val_dataloader, num_epochs):
 
         print(f'{epoch} Train Loss:{train_loss_all[-1]} Train acc{train_acc_all[-1]}')
         print(f'{epoch} Val Loss:{val_loss_all[-1]} Val acc{val_acc_all[-1]}')
+
+        if val_acc_all[-1] > best_acc:
+            # 保存当前最好准确度
+            best_acc = val_acc_all[-1]
+
+            best_model_wts = copy.deepcopy(model.state_dict())
+
+        # 计算训练耗时
+        time_use = time.time() - since
+
+        print(f'训练和验证耗时：{time_use//60}m,{time_use % 60}s')
+
+        model.load_stats_dict(best_model_wts)
+        torch.save(model.load_stats_dict(best_model_wts),'./best_model.pth')
+
+        train_process = pd.DataFrame(
+            data={
+                "epoch":range(num_epochs),
+                "train_loss_all":train_loss_all,
+                "val_loss_all":val_loss_all,
+                "train_acc_all":train_acc_all
+                "val_acc_all":val_acc_all
+            }
+        )
+    return train_process
+
