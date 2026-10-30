@@ -62,4 +62,20 @@ if __name__=="__main__":
     # 加载测试数据
     test_dataloader = test_data_process()
     # 加载模型测试的函数
-    test_model_process(model, test_dataloader)
+    # test_model_process(model, test_dataloader)
+
+    # 设定测试所用到的设备，有GPU用GPU没有GPU用CPU
+    device = "cuda" if torch.cuda.is_available() else 'cpu'
+    model = model.to(device)
+
+    with torch.no_grad():
+        for b_x,b_y in test_dataloader:
+            b_x=b_x.to(device)
+            b_y=b_y.to(device)
+
+            # 设置模型为验证模式
+            model.eval()
+            output = model(b_x)
+
+            pre_lab = torch.argmax(output,dim=1)
+            result = pre_lab.item()
