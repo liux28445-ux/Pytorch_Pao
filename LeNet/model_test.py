@@ -68,6 +68,7 @@ if __name__=="__main__":
     device = "cuda" if torch.cuda.is_available() else 'cpu'
     model = model.to(device)
 
+    classes = ['T-shirt/top','Trouser','Pullover','Dress','Coat', 'Sandal', 'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
     with torch.no_grad():
         for b_x,b_y in test_dataloader:
             b_x=b_x.to(device)
@@ -79,3 +80,6 @@ if __name__=="__main__":
 
             pre_lab = torch.argmax(output,dim=1)
             result = pre_lab.item()
+            label = b_y.item()
+
+            print(f'预测值{classes[result]},标签值{classes[label]}')
